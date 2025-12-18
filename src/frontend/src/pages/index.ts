@@ -1,0 +1,6 @@
+export { HomePage } from './HomePage'
+export { TasksPage } from './TasksPage'
+export { HabitsPage } from './HabitsPage'
+export { LifePage } from './LifePage'
+export { StatsPage } from './StatsPage'
+export { SettingsPage } from './SettingsPage'
