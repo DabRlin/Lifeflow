@@ -2,6 +2,12 @@
   "name": "lifeflow-v2",
   "private": true,
   "version": "0.1.0",
+  "description": "一款简约高效的个人效率应用，集成任务管理、习惯追踪和生活记录",
+  "author": "LifeFlow Team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DabRlin/Lifeflow.git"
+  },
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
