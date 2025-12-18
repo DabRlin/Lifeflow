@@ -289,7 +289,7 @@ export function SettingsPage() {
           </div>
 
           {/* Status */}
-          <div className="flex items-center gap-2 text-sm text-success-600">
+          <div className="flex items-center gap-2 text-sm text-primary-600">
             <CheckCircle className="w-4 h-4" />
             <span>所有服务运行正常</span>
           </div>

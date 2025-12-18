@@ -3,19 +3,12 @@ import { useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui-store'
 import { useUnreadCount, useGenerateReminders, useGenerateAtRiskNotifications } from '@/hooks/useNotifications'
-import { Menu, Bell, RefreshCw } from 'lucide-react'
+import { useTasks } from '@/hooks/useTasks'
+import { useInfiniteLifeEntries } from '@/hooks/useLifeEntries'
+import { useStatsOverview } from '@/hooks/useStats'
+import { Menu, Bell, RefreshCw, Calendar, Flame, CheckCircle2, BookOpen, BarChart3, Settings } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { NotificationPanel } from './NotificationPanel'
-
-// Page title mapping
-const pageTitles: Record<string, string> = {
-  '/': '首页',
-  '/tasks': '任务管理',
-  '/habits': '习惯追踪',
-  '/life': '生活记录',
-  '/stats': '数据统计',
-  '/settings': '设置',
-}
 
 interface HeaderProps {
   className?: string
@@ -30,21 +23,119 @@ export function Header({ className }: HeaderProps) {
   const [showNotifications, setShowNotifications] = React.useState(false)
   const notificationButtonRef = React.useRef<HTMLButtonElement>(null)
 
-  const pageTitle = pageTitles[location.pathname] || 'LifeFlow'
+  // Fetch data for context info
+  const { data: tasks } = useTasks()
+  const { data: statsOverview } = useStatsOverview()
+  const { data: lifeEntriesData } = useInfiniteLifeEntries(1)
 
   // Get unread count from API
   const unreadCount = unreadData?.count || 0
 
+  // Calculate context data
+  const today = React.useMemo(() => new Date().toISOString().split('T')[0], [])
+  
+  const contextData = React.useMemo(() => {
+    if (!tasks) return null
+    
+    const activeTasks = tasks.filter(t => !t.is_deleted)
+    const habits = activeTasks.filter(t => t.is_habit)
+    const pendingTasks = activeTasks.filter(t => !t.is_habit)
+    const completedToday = habits.filter(t => t.last_checkin_date === today).length
+    const pendingHabits = habits.length - completedToday
+    const longestStreak = habits.reduce((max, t) => Math.max(max, t.longest_streak || 0), 0)
+    
+    return {
+      totalTasks: pendingTasks.length,
+      totalHabits: habits.length,
+      completedToday,
+      pendingHabits,
+      longestStreak,
+    }
+  }, [tasks, today])
+
+  const totalEntries = React.useMemo(() => {
+    if (!lifeEntriesData?.pages?.[0]) return 0
+    return lifeEntriesData.pages[0].total || 0
+  }, [lifeEntriesData])
+
+  // Generate context info based on current page
+  const contextInfo = React.useMemo(() => {
+    const path = location.pathname
+    const now = new Date()
+    const dateStr = now.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'short',
+    })
+
+    switch (path) {
+      case '/':
+        return {
+          icon: <Calendar className="text-primary-500" />,
+          text: dateStr,
+          subtext: contextData 
+            ? `今日 ${contextData.completedToday}/${contextData.totalHabits} 习惯已完成`
+            : null,
+        }
+      case '/tasks':
+        return {
+          icon: <CheckCircle2 className="text-primary-500" />,
+          text: contextData ? `${contextData.totalTasks} 个任务` : '任务管理',
+          subtext: contextData && contextData.pendingHabits > 0 
+            ? `${contextData.pendingHabits} 个习惯待打卡`
+            : null,
+        }
+      case '/habits':
+        return {
+          icon: <Flame className="text-amber-500" />,
+          text: contextData 
+            ? `今日 ${contextData.completedToday}/${contextData.totalHabits}`
+            : '习惯追踪',
+          subtext: contextData && contextData.longestStreak > 0
+            ? `🔥 最长连胜 ${contextData.longestStreak} 天`
+            : null,
+        }
+      case '/life':
+        return {
+          icon: <BookOpen className="text-primary-500" />,
+          text: totalEntries > 0 ? `共 ${totalEntries} 条记录` : '生活记录',
+          subtext: null,
+        }
+      case '/stats':
+        return {
+          icon: <BarChart3 className="text-primary-500" />,
+          text: statsOverview 
+            ? `完成率 ${statsOverview.completion_rate?.toFixed(0) || 0}%`
+            : '数据统计',
+          subtext: statsOverview && statsOverview.today_checkins > 0
+            ? `今日 ${statsOverview.today_checkins} 次打卡`
+            : null,
+        }
+      case '/settings':
+        return {
+          icon: <Settings className="text-neutral-500" />,
+          text: '应用设置',
+          subtext: null,
+        }
+      default:
+        return {
+          icon: null,
+          text: 'LifeFlow',
+          subtext: null,
+        }
+    }
+  }, [location.pathname, contextData, totalEntries, statsOverview])
+
   // Generate notifications on first load of the day
   React.useEffect(() => {
     const lastGenDate = localStorage.getItem('lifeflow_last_notification_gen')
-    const today = new Date().toISOString().split('T')[0]
+    const todayStr = new Date().toISOString().split('T')[0]
     
-    if (lastGenDate !== today) {
-      // Generate reminders and at-risk notifications
+    if (lastGenDate !== todayStr) {
       generateReminders.mutate()
       generateAtRisk.mutate()
-      localStorage.setItem('lifeflow_last_notification_gen', today)
+      localStorage.setItem('lifeflow_last_notification_gen', todayStr)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -52,7 +143,6 @@ export function Header({ className }: HeaderProps) {
     <header
       className={cn(
         'sticky top-0 z-30 bg-surface border-b border-neutral-300',
-        // Total height = 32px (titlebar) + 48px (content) = 80px, matching sidebar
         'h-20 flex flex-col',
         className
       )}
@@ -61,11 +151,11 @@ export function Header({ className }: HeaderProps) {
       {/* Top spacer for macOS window controls alignment */}
       <div className="h-8 flex-shrink-0" />
 
-      {/* Header content - aligned with sidebar logo area */}
+      {/* Header content */}
       <div className="h-12 flex items-center justify-between px-4 flex-shrink-0">
-        {/* Left section - no-drag to allow button clicks */}
+        {/* Left section - context info */}
         <div
-          className="flex items-center gap-4"
+          className="flex items-center gap-3"
           style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
         >
           {/* Mobile menu button */}
@@ -79,11 +169,28 @@ export function Header({ className }: HeaderProps) {
             <Menu className="w-5 h-5" />
           </Button>
 
-          {/* Page title */}
-          <h1 className="text-lg font-semibold text-neutral-700">{pageTitle}</h1>
+          {/* Context info */}
+          <div className="flex items-center gap-2.5">
+            {contextInfo.icon && (
+              <span className="[&>svg]:w-5 [&>svg]:h-5">
+                {contextInfo.icon}
+              </span>
+            )}
+            <span className="text-base font-semibold text-neutral-800">
+              {contextInfo.text}
+            </span>
+            {contextInfo.subtext && (
+              <>
+                <span className="text-neutral-300 font-light">|</span>
+                <span className="text-sm font-medium text-neutral-500">
+                  {contextInfo.subtext}
+                </span>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Right section - no-drag to allow button clicks */}
+        {/* Right section - actions */}
         <div
           className="flex items-center gap-2"
           style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}

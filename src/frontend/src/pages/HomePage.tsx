@@ -103,31 +103,21 @@ export function HomePage() {
   // Get greeting based on time of day
   const greeting = React.useMemo(() => {
     const hour = new Date().getHours()
-    if (hour < 6) return '夜深了'
-    if (hour < 12) return '早上好'
-    if (hour < 14) return '中午好'
-    if (hour < 18) return '下午好'
-    return '晚上好'
+    if (hour < 6) return '夜深了，注意休息'
+    if (hour < 12) return '早上好，新的一天开始了'
+    if (hour < 14) return '中午好，记得吃午饭'
+    if (hour < 18) return '下午好，继续加油'
+    return '晚上好，今天辛苦了'
   }, [])
 
   return (
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-neutral-700 flex items-center gap-2">
-            {greeting}
-            <Sparkles className="w-6 h-6 text-primary-400" />
-          </h1>
-          <p className="text-neutral-600 mt-1">
-            {new Date().toLocaleDateString('zh-CN', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              weekday: 'long',
-            })}
-          </p>
-        </div>
+        <h1 className="text-2xl font-bold text-neutral-700 flex items-center gap-2">
+          {greeting}
+          <Sparkles className="w-6 h-6 text-primary-400" />
+        </h1>
       </div>
 
       {/* Main Content Grid */}
