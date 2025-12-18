@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Build outputs
+dist/
+dist-electron/
+build/
+release/
+*.spec
+
+# IDE and editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Environment and config
+.env
+.env.local
+*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test and coverage
+.pytest_cache/
+.hypothesis/
+coverage/
+.coverage
+htmlcov/
+
+# Kiro specs (optional - keep for development reference)
+# .kiro/
+
+# Backup files
+*.zip
+*.bak
+
+# OS files
+Thumbs.db
+ehthumbs.db
