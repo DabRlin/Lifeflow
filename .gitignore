@@ -10,7 +10,9 @@ dist/
 dist-electron/
 build/
 release/
-*.spec
+# PyInstaller spec files (but keep lifeflow.spec)
+# *.spec
+!lifeflow.spec
 
 # IDE and editor
 .vscode/
