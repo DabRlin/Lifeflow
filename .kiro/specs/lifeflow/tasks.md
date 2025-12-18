@@ -1,0 +1,235 @@
+# Implementation Plan
+
+- [x] 1. 项目初始化与基础架构搭建
+  - [x] 1.1 初始化前端项目结构
+    - 使用 Vite 创建 Vue 3 + TypeScript 项目
+    - 配置 Pinia 状态管理、Vue Router
+    - 设置 ESLint、Prettier 代码规范
+    - _Requirements: 1.1, 1.3_
+  - [x] 1.2 初始化后端项目结构
+    - 创建 FastAPI 项目骨架
+    - 配置 SQLite 数据库连接
+    - 设置 pytest 测试框架和 Hypothesis
+    - _Requirements: 1.1_
+  - [x] 1.3 创建数据库 Schema 和模型
+    - 实现 SQLite 表结构（card_lists, task_cards, checkin_records, life_entries, settings）
+    - 创建 SQLAlchemy/Pydantic 模型
+    - 实现数据库初始化和迁移逻辑
+    - _Requirements: 1.1, 1.4_
+  - [x] 1.4 编写数据库初始化属性测试
+    - **Property 1: Settings Round-Trip Consistency**
+    - **Validates: Requirements 1.3**
+  - [x] 1.5 配置 Electron 桌面容器
+    - 创建 Electron 主进程入口
+    - 配置开发环境热重载
+    - 设置前后端进程管理（Sidecar 模式）
+    - _Requirements: 1.1_
+
+- [x] 2. Checkpoint - 确保所有测试通过
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 3. 卡片列表管理功能
+  - [x] 3.1 实现卡片列表 CRUD API
+    - 创建 `/api/lists` 端点（GET, POST, PUT, DELETE）
+    - 实现列表数据验证
+    - _Requirements: 2.5_
+  - [x] 3.2 实现卡片列表前端组件
+    - 创建 CardListSidebar.vue 侧边栏组件
+    - 实现列表创建、编辑、删除交互
+    - 创建 listStore Pinia 状态管理
+    - _Requirements: 2.5_
+
+- [-] 4. 任务卡片基础管理功能
+  - [x] 4.1 实现任务卡片 CRUD API
+    - 创建 `/api/tasks` 端点（GET, POST, PUT, DELETE）
+    - 实现标题验证（非空、非纯空白）
+    - 实现软删除逻辑
+    - _Requirements: 2.1, 2.2, 2.3, 2.6_
+  - [ ]* 4.2 编写任务创建属性测试
+    - **Property 2: Task Creation Adds to List**
+    - **Validates: Requirements 2.1, 2.6**
+  - [ ]* 4.3 编写任务更新属性测试
+    - **Property 3: Task Update Persistence**
+    - **Validates: Requirements 2.2**
+  - [ ]* 4.4 编写软删除属性测试
+    - **Property 4: Soft Delete Exclusion**
+    - **Validates: Requirements 2.3, 8.4**
+  - [x] 4.5 实现任务卡片前端组件
+    - 创建 TaskCard.vue 卡片组件
+    - 创建 CardList.vue 列表视图组件
+    - 实现拖拽排序和跨列表移动
+    - 创建 taskStore Pinia 状态管理
+    - _Requirements: 2.1, 2.2, 2.3, 2.4_
+  - [ ]* 4.6 编写任务移动属性测试
+    - **Property 5: Task Move Updates List Association**
+    - **Validates: Requirements 2.4**
+
+- [x] 5. Checkpoint - 确保所有测试通过
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 6. 卡片展开编辑与 Markdown 支持
+  - [x] 6.1 集成 Markdown 编辑器
+    - 选择并集成 Vue Markdown 编辑器组件（如 md-editor-v3）
+    - 实现 Markdown 内容保存 API
+    - _Requirements: 3.1, 3.2, 3.3_
+  - [x] 6.2 实现卡片展开编辑面板
+    - 创建 TaskCardEditor.vue 编辑面板组件
+    - 实现点击卡片展开/收起交互
+    - 实现自动保存逻辑
+    - _Requirements: 3.1, 3.4_
+  - [ ]* 6.3 编写 Markdown 往返属性测试
+    - **Property 6: Markdown Round-Trip**
+    - **Validates: Requirements 3.5, 3.6**
+
+- [x] 7. 打卡与连胜机制
+  - [x] 7.1 实现打卡 API
+    - 创建 `/api/tasks/{id}/checkin` 端点
+    - 实现打卡记录存储
+    - 实现连胜计算算法（考虑时区）
+    - _Requirements: 4.1, 4.2, 4.3, 4.6_
+  - [ ]* 7.2 编写打卡记录属性测试
+    - **Property 7: Check-in Creates Record**
+    - **Validates: Requirements 4.1**
+  - [ ]* 7.3 编写连胜计算属性测试
+    - **Property 8: Streak Calculation Correctness**
+    - **Validates: Requirements 4.2, 4.3, 4.6**
+  - [x] 7.4 实现打卡前端交互
+    - 在 TaskCard.vue 添加打卡按钮
+    - 显示当前连胜天数
+    - 实现连胜 7 天以上的视觉高亮
+    - _Requirements: 4.1, 4.4, 4.5_
+
+- [x] 8. Checkpoint - 确保所有测试通过
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 9. 每日圆环可视化
+  - [x] 9.1 实现每日圆环数据 API
+    - 创建 `/api/stats/daily-ring` 端点
+    - 实现当日习惯完成百分比计算
+    - 处理日期边界（午夜重置）
+    - _Requirements: 5.1, 5.5_
+  - [ ]* 9.2 编写每日圆环计算属性测试
+    - **Property 9: Daily Ring Percentage Accuracy**
+    - **Validates: Requirements 5.1, 5.5**
+  - [x] 9.3 实现每日圆环前端组件
+    - 创建 DailyRing.vue 组件（使用 ECharts 或 Canvas）
+    - 实现进度动画和完成动画
+    - 显示数字百分比
+    - _Requirements: 5.1, 5.2, 5.3, 5.4_
+
+- [ ] 10. 桌面通知提醒
+  - [x] 10.1 实现提醒时间存储
+    - 在任务 API 中添加 reminderTime 字段处理
+    - 实现提醒时间验证
+    - _Requirements: 6.1_
+  - [x] 10.2 实现 Electron 通知服务
+    - 创建 NotificationService.ts
+    - 实现定时检查和通知触发
+    - 处理通知点击事件（聚焦应用、显示任务）
+    - _Requirements: 6.2, 6.3, 6.4_
+  - [x] 10.3 实现提醒设置 UI
+    - 在 TaskCardEditor 中添加提醒时间选择器
+    - 处理通知权限请求和拒绝情况
+    - _Requirements: 6.1, 6.5_
+
+- [x] 11. Checkpoint - 确保所有测试通过
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 12. 基础统计功能
+  - [x] 12.1 实现统计数据 API
+    - 创建 `/api/stats/overview` 端点
+    - 实现任务计数、完成率、最长连胜计算
+    - 实现今日完成汇总
+    - _Requirements: 7.1, 7.2, 7.3, 7.4_
+  - [ ]* 12.2 编写统计计算属性测试
+    - **Property 10: Statistics Calculation Accuracy**
+    - **Validates: Requirements 7.1, 7.2, 7.3, 7.4**
+  - [x] 12.3 实现统计仪表盘前端
+    - 创建 Statistics.vue 组件
+    - 显示任务统计卡片
+    - 集成每日圆环到仪表盘
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
+
+- [ ] 13. 生活记录功能
+  - [x] 13.1 实现生活记录 CRUD API
+    - 创建 `/api/life-entries` 端点（GET, POST, PUT, DELETE）
+    - 实现分页查询
+    - 实现按日期分组
+    - _Requirements: 8.1, 8.2, 8.4, 8.5, 8.6_
+  - [ ]* 13.2 编写生活记录创建属性测试
+    - **Property 11: Life Entry Creation with Timestamp**
+    - **Validates: Requirements 8.1**
+  - [ ]* 13.3 编写生活记录排序属性测试
+    - **Property 12: Life Entry Reverse Chronological Order**
+    - **Validates: Requirements 8.2**
+  - [ ]* 13.4 编写生活记录编辑属性测试
+    - **Property 13: Life Entry Edit Preserves Original Timestamp**
+    - **Validates: Requirements 8.3**
+  - [ ]* 13.5 编写生活记录分组属性测试
+    - **Property 14: Life Entry Date Grouping**
+    - **Validates: Requirements 8.5**
+  - [x] 13.6 实现生活记录前端组件
+    - 创建 LifeEntryInput.vue 输入组件
+    - 创建 LifeTimeline.vue 时间轴组件
+    - 实现无限滚动加载
+    - _Requirements: 8.1, 8.2, 8.3, 8.5, 8.6_
+
+- [x] 14. Checkpoint - 确保所有测试通过
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 15. 应用集成与打包
+  - [x] 15.1 实现应用视图路由
+    - 配置 Vue Router 路由（Home, Tasks, Habits, Life, Stats）
+    - 实现导航栏组件
+    - _Requirements: All_
+  - [x] 15.2 实现应用设置页面
+    - 创建设置视图
+    - 实现通知权限管理
+    - 实现数据导出功能
+    - _Requirements: 1.2, 1.3_
+  - [x] 15.3 配置跨平台打包
+    - 配置 electron-builder 打包脚本
+    - 测试 Windows 和 macOS 构建
+    - _Requirements: All_
+
+- [x] 17. PyInstaller 后端打包
+  - [x] 17.1 配置 PyInstaller 打包脚本
+    - 创建 `lifeflow.spec` PyInstaller 配置文件
+    - 配置 `--onefile` 单文件打包模式
+    - 添加必要的 `--hidden-import` 依赖（uvicorn, fastapi 等）
+    - 配置数据文件和资源文件包含
+    - _Requirements: 9.1_
+  - [x] 17.2 实现跨平台打包脚本
+    - 创建 `build_backend.py` 或 shell 脚本
+    - 支持 Windows (.exe) 和 macOS 二进制文件生成
+    - 配置输出目录与 Electron 打包流程集成
+    - _Requirements: 9.1, 9.6_
+  - [x] 17.3 更新 Electron Sidecar 管理器
+    - 修改 `sidecar.ts` 支持检测打包后的可执行文件路径
+    - 实现开发环境（Python）和生产环境（可执行文件）的路径切换
+    - 添加后端进程健康检查逻辑
+    - _Requirements: 9.2, 9.4_
+  - [x] 17.4 实现后端进程生命周期管理
+    - 确保 Electron 启动时正确启动后端进程
+    - 实现应用关闭时优雅终止后端进程
+    - 添加进程异常退出的重启机制
+    - _Requirements: 9.2, 9.5_
+  - [x] 17.5 更新数据库路径配置
+    - 修改后端代码支持从环境变量或命令行参数获取数据库路径
+    - 确保打包后的应用使用正确的用户数据目录
+    - _Requirements: 9.4_
+  - [x] 17.6 集成打包流程
+    - 更新 `package.json` 添加后端打包脚本
+    - 配置 electron-builder 包含后端可执行文件
+    - 创建完整的一键打包命令
+    - _Requirements: 9.1, 9.6_
+
+- [ ] 18. 独立应用测试验证
+  - [ ] 18.1 验证独立运行
+    - 在无 Python 环境的干净系统上测试应用启动
+    - 验证所有功能正常工作
+    - 测试数据库文件创建和读写
+    - _Requirements: 9.3_
+
+- [x] 16. Final Checkpoint - 确保所有测试通过
+  - Ensure all tests pass, ask the user if questions arise.
