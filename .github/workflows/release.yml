@@ -31,10 +31,11 @@ jobs:
           pip install pyinstaller
 
       - name: Build backend (macOS)
+        working-directory: src/backend
         run: |
-          pyinstaller --clean --noconfirm src/backend/lifeflow.spec
-          mkdir -p src/backend/dist
-          cp dist/lifeflow-backend src/backend/dist/
+          pyinstaller --clean --noconfirm lifeflow.spec
+          mkdir -p dist
+          cp ../../dist/lifeflow-backend dist/
 
       - name: Install frontend dependencies
         working-directory: src/frontend
@@ -78,10 +79,11 @@ jobs:
           pip install pyinstaller
 
       - name: Build backend (Windows)
+        working-directory: src/backend
         run: |
-          pyinstaller --clean --noconfirm src/backend/lifeflow.spec
-          mkdir -p src/backend/dist
-          copy dist\lifeflow-backend.exe src\backend\dist\
+          pyinstaller --clean --noconfirm lifeflow.spec
+          if not exist dist mkdir dist
+          copy ..\..\dist\lifeflow-backend.exe dist\
         shell: cmd
 
       - name: Install frontend dependencies
