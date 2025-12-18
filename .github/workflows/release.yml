@@ -34,8 +34,7 @@ jobs:
         run: |
           cd src/backend
           pyinstaller --clean --noconfirm lifeflow.spec
-          mkdir -p dist
-          cp ../../dist/lifeflow-backend dist/
+          ls -la dist/
 
       - name: Install frontend dependencies
         working-directory: src/frontend
@@ -82,8 +81,7 @@ jobs:
         run: |
           cd src/backend
           pyinstaller --clean --noconfirm lifeflow.spec
-          mkdir -p dist
-          cp ../../dist/lifeflow-backend.exe dist/
+          ls -la dist/
         shell: bash
 
       - name: Install frontend dependencies
