@@ -150,9 +150,9 @@ export function TrendChart({
   return (
     <div
       className={cn(
-        'bg-white rounded-xl p-4',
+        'bg-white rounded-2xl p-4',
         'shadow-elevation-1',
-        'border border-neutral-100',
+        'border border-outline-variant',
         className
       )}
     >

@@ -88,12 +88,12 @@ export function Header({ className }: HeaderProps) {
         }
       case '/habits':
         return {
-          icon: <Flame className="text-amber-500" />,
+          icon: <Flame className="text-primary-500" />,
           text: contextData 
             ? `今日 ${contextData.completedToday}/${contextData.totalHabits}`
             : '习惯追踪',
           subtext: contextData && contextData.longestStreak > 0
-            ? `🔥 最长连胜 ${contextData.longestStreak} 天`
+            ? `最长连胜 ${contextData.longestStreak} 天`
             : null,
         }
       case '/life':
@@ -114,7 +114,7 @@ export function Header({ className }: HeaderProps) {
         }
       case '/settings':
         return {
-          icon: <Settings className="text-neutral-500" />,
+          icon: <Settings className="text-primary-500" />,
           text: '应用设置',
           subtext: null,
         }
@@ -142,7 +142,7 @@ export function Header({ className }: HeaderProps) {
   return (
     <header
       className={cn(
-        'sticky top-0 z-30 bg-surface border-b border-neutral-300',
+        'sticky top-0 z-30 bg-surface-container-lowest border-b border-outline-variant',
         'h-20 flex flex-col',
         className
       )}

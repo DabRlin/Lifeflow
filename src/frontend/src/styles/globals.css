@@ -3,10 +3,10 @@
 /* Import the tailwind config */
 @config '../../tailwind.config.js';
 
-/* Base styles */
+/* Base styles - M3 Design System */
 @layer base {
   * {
-    @apply border-neutral-300;
+    @apply border-outline-variant;
     /* Hide scrollbar globally for app-like experience */
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -23,26 +23,47 @@
   }
 
   body {
-    @apply bg-surface text-neutral-700 antialiased;
+    @apply bg-surface-container-lowest text-neutral-700 antialiased;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
       sans-serif;
+    /* M3 默认字体大小 */
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.25px;
   }
 
   #root {
     @apply min-h-screen;
     width: 100%;
   }
+
+  /* M3 Typography defaults */
+  h1 {
+    @apply text-headline-lg text-neutral-700;
+  }
+  h2 {
+    @apply text-headline-md text-neutral-700;
+  }
+  h3 {
+    @apply text-title-lg text-neutral-700;
+  }
+  h4 {
+    @apply text-title-md text-neutral-700;
+  }
+  p {
+    @apply text-body-md text-neutral-600;
+  }
 }
 
 /* Component utilities */
 @layer components {
-  /* Card styles with elevation - M3 Surface Container */
+  /* Card styles - M3 Surface Container with outline */
   .card {
-    @apply bg-surface-container rounded-xl border border-neutral-300 shadow-elevation-1;
+    @apply bg-surface-container rounded-lg border border-outline-variant;
   }
 
   .card-hover {
-    @apply transition-shadow duration-200 hover:shadow-elevation-2;
+    @apply transition-colors duration-200 hover:bg-surface-container-high;
   }
 
   /* Button base styles - M3 Style */
@@ -57,11 +78,33 @@
   }
 
   .btn-secondary {
-    @apply bg-secondary-50 text-secondary-500 hover:bg-secondary-100;
+    @apply bg-secondary-50 text-secondary-700 hover:bg-secondary-100;
   }
 
   .btn-ghost {
     @apply hover:bg-surface-container-high hover:text-neutral-700;
+  }
+
+  /* M3 State Layer */
+  .state-layer {
+    @apply relative overflow-hidden;
+  }
+  
+  .state-layer::after {
+    content: '';
+    @apply absolute inset-0 bg-current opacity-0 transition-opacity duration-200 pointer-events-none;
+  }
+  
+  .state-layer:hover::after {
+    @apply opacity-[0.08];
+  }
+  
+  .state-layer:focus::after {
+    @apply opacity-[0.12];
+  }
+  
+  .state-layer:active::after {
+    @apply opacity-[0.12];
   }
 }
 

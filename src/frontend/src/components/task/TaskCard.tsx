@@ -1,14 +1,16 @@
 /**
  * TaskCard Component
  * Displays a single task card with hover/focus states and completion animation
- * Requirements: 4.1, 4.5
+ * Requirements: 4.1, 4.5, 5.1, 5.2, 5.3
  */
 
 import * as React from 'react'
-import { createPortal } from 'react-dom'
 import { cn, getLocalDateString } from '@/lib/utils'
-import type { Task, TaskUpdate } from '@/api/types'
+import type { Task, TaskUpdate, CardList } from '@/api/types'
 import { Check, GripVertical, Flame, Clock, Edit2, Trash2, X, Save } from 'lucide-react'
+import { Modal } from '@/components/ui/modal'
+import { Button } from '@/components/ui/button'
+import { CategorySelector } from '@/components/category'
 
 export interface TaskCardProps {
   task: Task
@@ -18,6 +20,8 @@ export interface TaskCardProps {
   isDragging?: boolean
   dragHandleProps?: React.HTMLAttributes<HTMLDivElement>
   className?: string
+  /** Available categories for the category selector in edit mode */
+  lists?: CardList[]
 }
 
 export function TaskCard({
@@ -28,6 +32,7 @@ export function TaskCard({
   isDragging = false,
   dragHandleProps,
   className,
+  lists = [],
 }: TaskCardProps) {
   const [isCompleting, setIsCompleting] = React.useState(false)
   const [showCompleted, setShowCompleted] = React.useState(false)
@@ -38,6 +43,7 @@ export function TaskCard({
   const [isEditing, setIsEditing] = React.useState(false)
   const [editTitle, setEditTitle] = React.useState(task.title)
   const [editContent, setEditContent] = React.useState(task.content || '')
+  const [editListId, setEditListId] = React.useState<string | null>(task.list_id)
   const [isSaving, setIsSaving] = React.useState(false)
   const titleInputRef = React.useRef<HTMLInputElement>(null)
 
@@ -71,6 +77,7 @@ export function TaskCard({
   const handleStartEdit = React.useCallback(() => {
     setEditTitle(task.title)
     setEditContent(task.content || '')
+    setEditListId(task.list_id)
     setIsEditing(true)
     // Focus input after render
     setTimeout(() => titleInputRef.current?.focus(), 0)
@@ -81,6 +88,7 @@ export function TaskCard({
     setIsEditing(false)
     setEditTitle(task.title)
     setEditContent(task.content || '')
+    setEditListId(task.list_id)
   }, [task])
 
   // Save editing
@@ -92,6 +100,7 @@ export function TaskCard({
       await onSave(task.id, {
         title: editTitle.trim(),
         content: editContent.trim() || undefined,
+        list_id: editListId,
       })
       setIsEditing(false)
     } catch {
@@ -99,7 +108,7 @@ export function TaskCard({
     } finally {
       setIsSaving(false)
     }
-  }, [task.id, editTitle, editContent, onSave, isSaving])
+  }, [task.id, editTitle, editContent, editListId, onSave, isSaving])
 
   // Handle key press in edit mode
   const handleKeyDown = React.useCallback((e: React.KeyboardEvent) => {
@@ -135,7 +144,7 @@ export function TaskCard({
   return (
     <div
       className={cn(
-        'group relative bg-surface-container rounded-xl border border-neutral-300',
+        'group relative bg-surface-container rounded-2xl border border-outline-variant',
         'shadow-elevation-1 hover:shadow-elevation-2',
         'transition-all duration-200 ease-out',
         'focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2',
@@ -147,7 +156,7 @@ export function TaskCard({
       role="article"
       aria-label={`任务: ${task.title}`}
     >
-      <div className="flex items-start gap-3 p-4">
+      <div className="flex gap-3 p-4">
         {/* Drag Handle */}
         {dragHandleProps && (
           <div
@@ -156,27 +165,29 @@ export function TaskCard({
               'flex-shrink-0 cursor-grab active:cursor-grabbing',
               'text-neutral-300 hover:text-neutral-500',
               'opacity-0 group-hover:opacity-100 transition-opacity',
-              '-ml-1 mt-0.5'
+              '-ml-1 pt-0.5'
             )}
           >
             <GripVertical className="w-5 h-5" />
           </div>
         )}
 
-        {/* Completion Button */}
+        {/* Completion Button - Consistent with HabitCard CheckinButton style */}
         <button
           onClick={handleComplete}
           disabled={isCompleting || (task.is_habit && isCompletedToday)}
           className={cn(
-            'flex-shrink-0 w-6 h-6 rounded-full border-2',
+            'flex-shrink-0 w-8 h-8 rounded-full border-[3px]',
             'flex items-center justify-center',
-            'transition-all duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+            'transition-all duration-300 ease-out',
+            'focus:outline-none focus:ring-2 focus:ring-primary-200 focus:ring-offset-2',
             task.is_habit
               ? isCompletedToday
-                ? 'bg-primary-100 border-primary-200 text-primary-600'
-                : 'border-neutral-400 hover:bg-primary-50 hover:border-primary-300'
-              : 'border-neutral-400 hover:bg-primary-50 hover:border-primary-300',
+                ? 'bg-primary-100 border-primary-300 text-primary-600'
+                : 'border-neutral-400 hover:border-primary-400 hover:bg-primary-50 hover:scale-105'
+              : showCompleted
+                ? 'bg-primary-100 border-primary-300 text-primary-600'
+                : 'border-neutral-400 hover:border-primary-400 hover:bg-primary-50 hover:scale-105',
             isCompleting && 'animate-pulse'
           )}
           aria-label={task.is_habit ? '打卡' : '完成任务'}
@@ -187,7 +198,7 @@ export function TaskCard({
         </button>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 pt-px">
           {isEditing ? (
             // Edit Mode
             <div className="space-y-2" onKeyDown={handleKeyDown}>
@@ -200,11 +211,11 @@ export function TaskCard({
                 disabled={isSaving}
                 style={{
                   width: '100%',
-                  padding: '0.5rem',
+                  padding: '0.625rem 0.75rem',
                   fontSize: '0.875rem',
                   fontWeight: 500,
-                  border: '1px solid #e5e5e5',
-                  borderRadius: '0.375rem',
+                  border: '1px solid #CAC4D0',
+                  borderRadius: '0.75rem',
                   outline: 'none',
                 }}
               />
@@ -216,13 +227,21 @@ export function TaskCard({
                 rows={2}
                 style={{
                   width: '100%',
-                  padding: '0.5rem',
+                  padding: '0.625rem 0.75rem',
                   fontSize: '0.875rem',
-                  border: '1px solid #e5e5e5',
-                  borderRadius: '0.375rem',
+                  border: '1px solid #CAC4D0',
+                  borderRadius: '0.75rem',
                   outline: 'none',
                   resize: 'none',
                 }}
+              />
+              {/* Category Selector - Requirements 5.1, 5.2, 5.3 */}
+              <CategorySelector
+                value={editListId}
+                onChange={setEditListId}
+                lists={lists}
+                disabled={isSaving}
+                placeholder="选择分类"
               />
               <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                 <button
@@ -232,7 +251,7 @@ export function TaskCard({
                     padding: '0.375rem 0.75rem',
                     fontSize: '0.75rem',
                     fontWeight: 500,
-                    borderRadius: '0.375rem',
+                    borderRadius: '1rem',
                     color: '#525252',
                     backgroundColor: '#f5f5f5',
                     border: 'none',
@@ -252,9 +271,9 @@ export function TaskCard({
                     padding: '0.375rem 0.75rem',
                     fontSize: '0.75rem',
                     fontWeight: 500,
-                    borderRadius: '0.375rem',
+                    borderRadius: '1rem',
                     color: 'white',
-                    backgroundColor: isSaving || !editTitle.trim() ? '#93c5fd' : '#3b82f6',
+                    backgroundColor: isSaving || !editTitle.trim() ? '#B69DF8' : '#6750A4',
                     border: 'none',
                     cursor: isSaving || !editTitle.trim() ? 'not-allowed' : 'pointer',
                     display: 'flex',
@@ -272,7 +291,7 @@ export function TaskCard({
             <>
               <h3
                 className={cn(
-                  'text-neutral-700 font-medium leading-snug',
+                  'text-sm text-neutral-700 font-medium leading-snug',
                   'transition-colors duration-200',
                   showCompleted && !task.is_habit && 'line-through text-neutral-500'
                 )}
@@ -281,7 +300,7 @@ export function TaskCard({
               </h3>
               
               {task.content && (
-                <p className="text-neutral-600 text-sm mt-1 line-clamp-2">
+                <p className="text-neutral-500 text-xs mt-1 line-clamp-2">
                   {task.content}
                 </p>
               )}
@@ -325,14 +344,14 @@ export function TaskCard({
 
         {/* Action Buttons - Only show when not editing */}
         {!isEditing && (
-          <div className="flex-shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+          <div className="flex-shrink-0 flex items-start gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
             {/* Edit Button */}
             {onSave && (
               <button
                 onClick={handleStartEdit}
                 className={cn(
                   'p-2 rounded-md',
-                  'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100',
+                  'text-neutral-400 hover:text-primary-600 hover:bg-primary-50',
                   'transition-all duration-200',
                   'focus:outline-none focus:ring-2 focus:ring-primary-500'
                 )}
@@ -348,9 +367,9 @@ export function TaskCard({
                 onClick={handleDeleteClick}
                 className={cn(
                   'p-2 rounded-md',
-                  'text-neutral-400 hover:text-red-500 hover:bg-red-50',
+                  'text-neutral-400 hover:text-primary-600 hover:bg-primary-50',
                   'transition-all duration-200',
-                  'focus:outline-none focus:ring-2 focus:ring-red-500'
+                  'focus:outline-none focus:ring-2 focus:ring-primary-500'
                 )}
                 aria-label="删除任务"
               >
@@ -373,84 +392,27 @@ export function TaskCard({
       )}
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && createPortal(
-        <div 
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {/* Backdrop */}
-          <div 
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            }}
-            onClick={handleDeleteCancel}
-          />
-          
-          {/* Modal */}
-          <div 
-            style={{
-              position: 'relative',
-              backgroundColor: 'white',
-              borderRadius: '0.75rem',
-              padding: '1.5rem',
-              maxWidth: '24rem',
-              width: '100%',
-              margin: '0 1rem',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-            }}
-          >
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#171717' }}>
-              确认删除
-            </h3>
-            <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#525252' }}>
-              确定要删除任务 "{task.title}" 吗？此操作无法撤销。
-            </p>
-            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-              <button
-                onClick={handleDeleteCancel}
-                style={{
-                  padding: '0.5rem 1rem',
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  borderRadius: '0.5rem',
-                  color: '#404040',
-                  backgroundColor: '#f5f5f5',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                取消
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                disabled={isDeleting}
-                style={{
-                  padding: '0.5rem 1rem',
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  borderRadius: '0.5rem',
-                  color: 'white',
-                  backgroundColor: isDeleting ? '#fca5a5' : '#ef4444',
-                  border: 'none',
-                  cursor: isDeleting ? 'not-allowed' : 'pointer',
-                  opacity: isDeleting ? 0.5 : 1,
-                }}
-              >
-                {isDeleting ? '删除中...' : '删除'}
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      <Modal
+        isOpen={showDeleteConfirm}
+        onClose={handleDeleteCancel}
+        title="确认删除"
+        footer={
+          <>
+            <Button variant="outline" onClick={handleDeleteCancel}>
+              取消
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? '删除中...' : '删除'}
+            </Button>
+          </>
+        }
+      >
+        <p>确定要删除任务 "{task.title}" 吗？此操作无法撤销。</p>
+      </Modal>
     </div>
   )
 }

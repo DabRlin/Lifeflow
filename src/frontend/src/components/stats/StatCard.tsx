@@ -63,22 +63,22 @@ function useAnimatedNumber(target: number, duration: number = 800): number {
 const colorSchemes = {
   primary: {
     bg: 'bg-primary-100',
-    text: 'text-primary-600',
+    text: 'text-primary-700',
     icon: 'text-primary-600',
   },
   success: {
-    bg: 'bg-primary-100',
-    text: 'text-primary-600',
-    icon: 'text-primary-600',
+    bg: 'bg-success-100',
+    text: 'text-success-700',
+    icon: 'text-success-600',
   },
   warning: {
-    bg: 'bg-primary-100',
-    text: 'text-primary-600',
-    icon: 'text-primary-600',
+    bg: 'bg-warning-100',
+    text: 'text-warning-700',
+    icon: 'text-warning-600',
   },
   error: {
     bg: 'bg-error-100',
-    text: 'text-error-600',
+    text: 'text-error-700',
     icon: 'text-error-600',
   },
 }
@@ -99,15 +99,15 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'bg-surface-container rounded-xl p-6',
+        'bg-surface-container rounded-2xl p-6',
         'shadow-elevation-1 hover:shadow-elevation-2',
-        'border border-neutral-300',
+        'border border-outline-variant',
         'transition-shadow duration-200',
         className
       )}
     >
       <div className="flex items-center gap-4">
-        <div className={cn('p-3 rounded-xl', colors.bg, colors.icon)}>
+        <div className={cn('p-3 rounded-lg', colors.bg, colors.icon)}>
           {icon}
         </div>
         <div className="flex-1 min-w-0">

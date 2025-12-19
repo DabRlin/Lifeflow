@@ -8,6 +8,8 @@ import { useCallback, useState } from 'react'
 import { useInfiniteLifeEntries, useCreateLifeEntry, useUpdateLifeEntry, useDeleteLifeEntry } from '@/hooks/useLifeEntries'
 import { InfiniteTimeline, TimelineSkeleton, EntryInput } from '@/components/life'
 import { EmptyState } from '@/components/common/EmptyState'
+import { Modal } from '@/components/ui/modal'
+import { Button } from '@/components/ui/button'
 import { AlertCircle } from 'lucide-react'
 import type { LifeEntry } from '@/api/types'
 
@@ -122,83 +124,27 @@ export function LifePage() {
         </div>
 
       {/* Delete Confirmation Modal */}
-      {deleteConfirmId && (
-        <div 
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 50,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {/* Backdrop */}
-          <div 
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            }}
-            onClick={cancelDelete}
-          />
-          
-          {/* Modal */}
-          <div 
-            style={{
-              position: 'relative',
-              backgroundColor: 'white',
-              borderRadius: '0.75rem',
-              padding: '1.5rem',
-              maxWidth: '24rem',
-              width: '100%',
-              margin: '0 1rem',
-            }}
-            className="shadow-elevation-4"
-          >
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#171717' }}>
-              确认删除
-            </h3>
-            <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#525252' }}>
-              确定要删除这条记录吗？此操作无法撤销。
-            </p>
-            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-              <button
-                onClick={cancelDelete}
-                style={{
-                  padding: '0.5rem 1rem',
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  borderRadius: '0.5rem',
-                  color: '#404040',
-                  backgroundColor: '#f5f5f5',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                取消
-              </button>
-              <button
-                onClick={confirmDelete}
-                disabled={deleteMutation.isPending}
-                style={{
-                  padding: '0.5rem 1rem',
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  borderRadius: '0.5rem',
-                  color: 'white',
-                  backgroundColor: deleteMutation.isPending ? '#fca5a5' : '#ef4444',
-                  border: 'none',
-                  cursor: deleteMutation.isPending ? 'not-allowed' : 'pointer',
-                  opacity: deleteMutation.isPending ? 0.5 : 1,
-                }}
-              >
-                {deleteMutation.isPending ? '删除中...' : '删除'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        isOpen={!!deleteConfirmId}
+        onClose={cancelDelete}
+        title="确认删除"
+        footer={
+          <>
+            <Button variant="outline" onClick={cancelDelete}>
+              取消
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? '删除中...' : '删除'}
+            </Button>
+          </>
+        }
+      >
+        <p>确定要删除这条记录吗？此操作无法撤销。</p>
+      </Modal>
     </div>
   )
 }

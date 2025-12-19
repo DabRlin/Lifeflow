@@ -164,7 +164,7 @@ export function TimelineSkeleton({ count = 5 }: { count?: number }) {
               <div className="h-px flex-1 bg-neutral-200" />
             </div>
           )}
-          <div className="bg-white rounded-lg p-4 shadow-elevation-1 border border-neutral-100 ml-2">
+          <div className="bg-white rounded-lg p-4 shadow-elevation-1 border border-outline-variant ml-2">
             <LoadingSkeleton variant="text" width="100%" height={16} />
             <LoadingSkeleton variant="text" width="80%" height={16} className="mt-2" />
             <LoadingSkeleton variant="text" width={60} height={12} className="mt-3" />

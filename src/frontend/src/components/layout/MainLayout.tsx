@@ -12,7 +12,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const { sidebarOpen } = useUIStore()
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-surface-container-lowest">
       {/* Sidebar */}
       <Sidebar />
 

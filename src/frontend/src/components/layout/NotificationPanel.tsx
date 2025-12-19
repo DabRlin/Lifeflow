@@ -125,7 +125,7 @@ export function NotificationPanel({ isOpen, onClose, anchorRef }: NotificationPa
     <div
       ref={panelRef}
       className={cn(
-        'fixed z-50 w-80 bg-white rounded-xl shadow-elevation-3 border border-neutral-200',
+        'fixed z-50 w-80 bg-surface-container-high rounded-2xl border border-outline-variant',
         'animate-fade-in'
       )}
       style={{ top, right }}
@@ -224,7 +224,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
     <div
       onClick={() => !notification.is_read && onMarkAsRead(notification.id)}
       className={cn(
-        'px-4 py-3 cursor-pointer transition-colors',
+        'mx-2 px-2 py-3 cursor-pointer transition-colors rounded-lg',
         'hover:bg-neutral-50',
         !notification.is_read && 'bg-primary-50/30'
       )}
@@ -253,7 +253,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
             </p>
             <button
               onClick={(e) => onDelete(notification.id, e)}
-              className="flex-shrink-0 p-1 rounded text-neutral-400 hover:text-red-500 hover:bg-red-50"
+              className="flex-shrink-0 p-1.5 rounded-lg text-neutral-400 hover:text-primary-600 hover:bg-primary-50"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>

@@ -1,21 +1,28 @@
 /**
  * TasksPage Component
  * Main page for task management with list filtering and CRUD operations
- * Requirements: 4.1-4.6
+ * Requirements: 4.1-4.6, 6.1, 7.1
  */
 
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 import { useTasks, useCreateTask, useUpdateTask, useDeleteTask, useCheckinTask } from '@/hooks/useTasks'
-import { useLists } from '@/hooks/useLists'
+import { useLists, useCreateList, useUpdateList, useDeleteList } from '@/hooks/useLists'
 import { TaskList, TaskCreateForm } from '@/components/task'
 import { LoadingSkeleton, EmptyState } from '@/components/common'
-import type { Task, TaskCreate, TaskUpdate } from '@/api/types'
-import { ListFilter, CheckCircle2, Flame } from 'lucide-react'
+import { CategoryFilter, CategoryModal, DeleteCategoryModal } from '@/components/category'
+import type { Task, TaskCreate, TaskUpdate, CardList, CardListCreate, CardListUpdate } from '@/api/types'
+import { CheckCircle2, Flame } from 'lucide-react'
 
 export function TasksPage() {
   const [selectedListId, setSelectedListId] = React.useState<string | null>(null)
   const [filter, setFilter] = React.useState<'all' | 'tasks' | 'habits'>('all')
+  
+  // Category modal states
+  const [showCategoryModal, setShowCategoryModal] = React.useState(false)
+  const [editingCategory, setEditingCategory] = React.useState<CardList | undefined>(undefined)
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false)
+  const [deletingCategory, setDeletingCategory] = React.useState<CardList | null>(null)
 
   // Data fetching
   const { data: tasks, isLoading: tasksLoading, error: tasksError } = useTasks({
@@ -28,6 +35,9 @@ export function TasksPage() {
   const updateTask = useUpdateTask()
   const deleteTask = useDeleteTask()
   const checkinTask = useCheckinTask()
+  const createList = useCreateList()
+  const updateList = useUpdateList()
+  const deleteList = useDeleteList()
 
   // Filter tasks based on selected filter
   const filteredTasks = React.useMemo(() => {
@@ -71,6 +81,55 @@ export function TasksPage() {
     console.log('Tasks reordered:', reorderedTasks.map(t => t.id))
   }, [])
 
+  // Category handlers
+  const handleOpenCreateCategory = React.useCallback(() => {
+    setEditingCategory(undefined)
+    setShowCategoryModal(true)
+  }, [])
+
+  const handleOpenEditCategory = React.useCallback((list: CardList) => {
+    setEditingCategory(list)
+    setShowCategoryModal(true)
+  }, [])
+
+  const handleOpenDeleteCategory = React.useCallback((list: CardList) => {
+    setDeletingCategory(list)
+    setShowDeleteModal(true)
+  }, [])
+
+  const handleCloseCategoryModal = React.useCallback(() => {
+    setShowCategoryModal(false)
+    setEditingCategory(undefined)
+  }, [])
+
+  const handleCloseDeleteModal = React.useCallback(() => {
+    setShowDeleteModal(false)
+    setDeletingCategory(null)
+  }, [])
+
+  const handleSubmitCategory = React.useCallback(async (data: CardListCreate | CardListUpdate) => {
+    if (editingCategory) {
+      await updateList.mutateAsync({ listId: editingCategory.id, data })
+    } else {
+      await createList.mutateAsync(data as CardListCreate)
+    }
+  }, [editingCategory, createList, updateList])
+
+  const handleConfirmDeleteCategory = React.useCallback(async () => {
+    if (!deletingCategory) return
+    await deleteList.mutateAsync(deletingCategory.id)
+    // If the deleted category was selected, reset to "All"
+    if (selectedListId === deletingCategory.id) {
+      setSelectedListId(null)
+    }
+  }, [deletingCategory, deleteList, selectedListId])
+
+  // Count tasks in the category being deleted
+  const deletingCategoryTaskCount = React.useMemo(() => {
+    if (!deletingCategory || !tasks) return 0
+    return tasks.filter(t => t.list_id === deletingCategory.id).length
+  }, [deletingCategory, tasks])
+
   // Loading state
   if (tasksLoading || listsLoading) {
     return (
@@ -103,9 +162,9 @@ export function TasksPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex-shrink-0 px-6 py-4 border-b border-neutral-300 bg-surface">
+      <div className="flex-shrink-0 px-6 py-4 border-b border-outline-variant bg-surface">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-neutral-700">任务管理</h1>
+          <h1 className="text-headline-md font-semibold text-neutral-700">任务管理</h1>
 
           {/* Filter Tabs */}
           <div className="flex items-center gap-1 p-1 bg-surface-container-high rounded-full">
@@ -147,39 +206,16 @@ export function TasksPage() {
           </div>
         </div>
 
-        {/* List Filter */}
-        {lists && lists.length > 0 && (
-          <div className="flex items-center gap-2 mt-4">
-            <ListFilter className="w-4 h-4 text-neutral-500" />
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                onClick={() => setSelectedListId(null)}
-                className={cn(
-                  'px-3 py-1 text-sm rounded-full transition-colors',
-                  selectedListId === null
-                    ? 'bg-secondary-50 text-primary-500'
-                    : 'bg-surface-container-high text-neutral-600 hover:bg-surface-container-highest'
-                )}
-              >
-                全部列表
-              </button>
-              {lists.map((list) => (
-                <button
-                  key={list.id}
-                  onClick={() => setSelectedListId(list.id)}
-                  className={cn(
-                    'px-3 py-1 text-sm rounded-full transition-colors',
-                    selectedListId === list.id
-                      ? 'bg-secondary-50 text-primary-500'
-                      : 'bg-surface-container-high text-neutral-600 hover:bg-surface-container-highest'
-                  )}
-                >
-                  {list.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Category Filter */}
+        <CategoryFilter
+          lists={lists ?? []}
+          selectedListId={selectedListId}
+          onSelectList={setSelectedListId}
+          onCreateList={handleOpenCreateCategory}
+          onEditList={handleOpenEditCategory}
+          onDeleteList={handleOpenDeleteCategory}
+          className="mt-4"
+        />
       </div>
 
       {/* Content */}
@@ -187,6 +223,7 @@ export function TasksPage() {
         {/* Create Form */}
         <TaskCreateForm
           listId={selectedListId}
+          lists={lists ?? []}
           onSubmit={handleCreateTask}
           isLoading={createTask.isPending}
           className="mb-6"
@@ -218,9 +255,29 @@ export function TasksPage() {
               await deleteTask.mutateAsync({ taskId: task.id })
             }}
             onReorder={handleReorderTasks}
+            lists={lists ?? []}
           />
         )}
       </div>
+
+      {/* Category Modal (Create/Edit) */}
+      <CategoryModal
+        isOpen={showCategoryModal}
+        onClose={handleCloseCategoryModal}
+        list={editingCategory}
+        onSubmit={handleSubmitCategory}
+        isLoading={createList.isPending || updateList.isPending}
+      />
+
+      {/* Delete Category Modal */}
+      <DeleteCategoryModal
+        isOpen={showDeleteModal}
+        onClose={handleCloseDeleteModal}
+        list={deletingCategory}
+        onConfirm={handleConfirmDeleteCategory}
+        isLoading={deleteList.isPending}
+        taskCount={deletingCategoryTaskCount}
+      />
     </div>
   )
 }

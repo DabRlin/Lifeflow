@@ -115,7 +115,7 @@ export function HomePage() {
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-neutral-700 flex items-center gap-2">
+        <h1 className="text-headline-md font-semibold text-neutral-700 flex items-center gap-2">
           {greeting}
           <Sparkles className="w-6 h-6 text-primary-400" />
         </h1>
@@ -172,14 +172,14 @@ export function HomePage() {
                 title="今日打卡"
                 value={statsOverview?.today_checkins ?? localStats?.completedToday ?? 0}
                 icon={<CheckCircle2 className="w-5 h-5" />}
-                colorScheme="success"
+                colorScheme="primary"
               />
               <StatCard
                 title="最长连胜"
                 value={statsOverview?.longest_streak ?? localStats?.longestStreak ?? 0}
                 suffix="天"
                 icon={<Flame className="w-5 h-5" />}
-                colorScheme="warning"
+                colorScheme="primary"
               />
               <StatCard
                 title="习惯总数"
@@ -199,7 +199,7 @@ export function HomePage() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base">
-                <Flame className="w-5 h-5 text-amber-500" />
+                <Flame className="w-5 h-5 text-primary-500" />
                 待完成习惯
               </CardTitle>
               <Link to="/habits">
@@ -405,7 +405,7 @@ function QuickNavCard({ to, icon, title, description }: QuickNavCardProps) {
       className={cn(
         'flex flex-col items-center p-4 rounded-xl',
         'bg-surface-container-high hover:bg-surface-container-highest',
-        'border border-neutral-300',
+        'border border-outline-variant',
         'transition-all duration-200',
         'hover:shadow-elevation-1'
       )}

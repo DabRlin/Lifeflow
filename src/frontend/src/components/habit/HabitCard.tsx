@@ -58,7 +58,7 @@ export function HabitCard({
   return (
     <div
       className={cn(
-        'group relative bg-surface-container rounded-xl border border-neutral-300',
+        'group relative bg-surface-container rounded-2xl border border-outline-variant',
         'shadow-elevation-1 hover:shadow-elevation-2',
         'transition-all duration-200 ease-out',
         'p-4',
@@ -79,7 +79,7 @@ export function HabitCard({
           <div className="flex items-start justify-between gap-2">
             <h3
               className={cn(
-                'text-neutral-700 font-medium leading-snug',
+                'text-sm text-neutral-700 font-medium leading-snug',
                 isCompletedToday && 'text-primary-600'
               )}
             >
@@ -106,7 +106,7 @@ export function HabitCard({
                 <div
                   className={cn(
                     'absolute right-0 top-full mt-1 z-10',
-                    'bg-white rounded-lg shadow-elevation-3 border border-neutral-100',
+                    'bg-white rounded-lg shadow-elevation-3 border border-outline-variant',
                     'py-1 min-w-[120px]',
                     'animate-fade-in'
                   )}
@@ -117,7 +117,7 @@ export function HabitCard({
                         setShowMenu(false)
                         onEdit(habit)
                       }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
+                      className="flex items-center gap-2 w-[calc(100%-8px)] mx-1 px-2 py-2 text-sm text-neutral-700 hover:bg-neutral-50 rounded-md"
                     >
                       <Edit2 className="w-4 h-4" />
                       编辑
@@ -129,7 +129,7 @@ export function HabitCard({
                         setShowMenu(false)
                         onDelete(habit)
                       }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-error-600 hover:bg-error-50"
+                      className="flex items-center gap-2 w-[calc(100%-8px)] mx-1 px-2 py-2 text-sm text-primary-600 hover:bg-primary-50 rounded-md"
                     >
                       <Trash2 className="w-4 h-4" />
                       删除
@@ -141,7 +141,7 @@ export function HabitCard({
           </div>
 
           {habit.content && (
-            <p className="text-neutral-600 text-sm mt-1 line-clamp-2">
+            <p className="text-neutral-500 text-xs mt-1 line-clamp-2">
               {habit.content}
             </p>
           )}

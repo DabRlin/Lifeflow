@@ -115,8 +115,8 @@ export function StatsPage() {
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">统计仪表盘</h1>
-        <p className="text-neutral-500 mt-1">查看你的进度和成就</p>
+        <h1 className="text-headline-md font-semibold text-neutral-700">统计仪表盘</h1>
+        <p className="text-body-md text-neutral-600 mt-1">查看你的进度和成就</p>
       </div>
 
       {/* Daily Progress Section */}

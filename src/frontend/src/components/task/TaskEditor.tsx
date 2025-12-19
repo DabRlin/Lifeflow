@@ -5,10 +5,10 @@
  */
 
 import * as React from 'react'
-import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Modal } from '@/components/ui/modal'
 import {
   Sheet,
   SheetContent,
@@ -302,85 +302,28 @@ export function TaskEditor({
 
     </Sheet>
 
-    {/* Delete Confirmation Modal - Using Portal to render at document.body */}
-    {showDeleteConfirm && createPortal(
-      <div 
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {/* Backdrop */}
-        <div 
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}
-          onClick={handleDeleteCancel}
-        />
-        
-        {/* Modal */}
-        <div 
-          style={{
-            position: 'relative',
-            backgroundColor: 'white',
-            borderRadius: '0.75rem',
-            padding: '1.5rem',
-            maxWidth: '24rem',
-            width: '100%',
-            margin: '0 1rem',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-          }}
-        >
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#171717' }}>
-            确认删除
-          </h3>
-          <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#525252' }}>
-            确定要删除这个任务吗？此操作无法撤销。
-          </p>
-          <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-            <button
-              onClick={handleDeleteCancel}
-              style={{
-                padding: '0.5rem 1rem',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                borderRadius: '0.5rem',
-                color: '#404040',
-                backgroundColor: '#f5f5f5',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              取消
-            </button>
-            <button
-              onClick={handleDeleteConfirm}
-              disabled={isDeleting}
-              style={{
-                padding: '0.5rem 1rem',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                borderRadius: '0.5rem',
-                color: 'white',
-                backgroundColor: isDeleting ? '#fca5a5' : '#ef4444',
-                border: 'none',
-                cursor: isDeleting ? 'not-allowed' : 'pointer',
-                opacity: isDeleting ? 0.5 : 1,
-              }}
-            >
-              {isDeleting ? '删除中...' : '删除'}
-            </button>
-          </div>
-        </div>
-      </div>,
-      document.body
-    )}
+    {/* Delete Confirmation Modal */}
+    <Modal
+      isOpen={showDeleteConfirm}
+      onClose={handleDeleteCancel}
+      title="确认删除"
+      footer={
+        <>
+          <Button variant="outline" onClick={handleDeleteCancel}>
+            取消
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDeleteConfirm}
+            disabled={isDeleting}
+          >
+            {isDeleting ? '删除中...' : '删除'}
+          </Button>
+        </>
+      }
+    >
+      <p>确定要删除这个任务吗？此操作无法撤销。</p>
+    </Modal>
     </>
   )
 }

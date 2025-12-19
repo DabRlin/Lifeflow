@@ -179,11 +179,11 @@ export function SettingsPage() {
     <div className="p-6 space-y-6 max-w-3xl mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900 flex items-center gap-2">
+        <h1 className="text-headline-md font-semibold text-neutral-700 flex items-center gap-2">
           <Settings className="w-6 h-6" />
           设置
         </h1>
-        <p className="text-neutral-500 mt-1">管理应用偏好和数据</p>
+        <p className="text-body-md text-neutral-600 mt-1">管理应用偏好和数据</p>
       </div>
 
       {/* Notification Settings */}

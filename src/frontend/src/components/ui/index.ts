@@ -13,6 +13,7 @@ export {
   DialogDescription,
 } from './dialog'
 export { Input } from './input'
+export { Modal } from './modal'
 export {
   Sheet,
   SheetPortal,

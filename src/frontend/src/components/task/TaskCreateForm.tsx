@@ -1,18 +1,22 @@
 /**
  * TaskCreateForm Component
  * Inline form for creating new tasks with smooth animation
- * Requirements: 4.2
+ * Requirements: 4.1, 4.2
  */
 
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { CategorySelector } from '@/components/category'
 import { Plus, X, Loader2 } from 'lucide-react'
-import type { TaskCreate } from '@/api/types'
+import type { TaskCreate, CardList } from '@/api/types'
 
 export interface TaskCreateFormProps {
+  /** Pre-selected list ID (optional) */
   listId?: string | null
+  /** Available categories for selection */
+  lists?: CardList[]
   onSubmit: (data: TaskCreate) => Promise<void>
   onCancel?: () => void
   isLoading?: boolean
@@ -21,6 +25,7 @@ export interface TaskCreateFormProps {
 
 export function TaskCreateForm({
   listId,
+  lists = [],
   onSubmit,
   onCancel,
   isLoading = false,
@@ -29,7 +34,13 @@ export function TaskCreateForm({
   const [isExpanded, setIsExpanded] = React.useState(false)
   const [title, setTitle] = React.useState('')
   const [isHabit, setIsHabit] = React.useState(false)
+  const [selectedListId, setSelectedListId] = React.useState<string | null>(listId ?? null)
   const inputRef = React.useRef<HTMLInputElement>(null)
+
+  // Sync selectedListId with listId prop when it changes
+  React.useEffect(() => {
+    setSelectedListId(listId ?? null)
+  }, [listId])
 
   // Focus input when expanded
   React.useEffect(() => {
@@ -46,8 +57,9 @@ export function TaskCreateForm({
     setIsExpanded(false)
     setTitle('')
     setIsHabit(false)
+    setSelectedListId(listId ?? null)
     onCancel?.()
-  }, [onCancel])
+  }, [onCancel, listId])
 
   const handleSubmit = React.useCallback(
     async (e: React.FormEvent) => {
@@ -59,20 +71,21 @@ export function TaskCreateForm({
       try {
         await onSubmit({
           title: trimmedTitle,
-          list_id: listId,
+          list_id: selectedListId,
           is_habit: isHabit,
         })
         
         // Reset form after successful submission
         setTitle('')
         setIsHabit(false)
+        // Keep the selected list for quick consecutive additions
         // Keep expanded for quick consecutive additions
         inputRef.current?.focus()
       } catch {
         // Error handling is done by parent component
       }
     },
-    [title, listId, isHabit, isLoading, onSubmit]
+    [title, selectedListId, isHabit, isLoading, onSubmit]
   )
 
   const handleKeyDown = React.useCallback(
@@ -93,7 +106,7 @@ export function TaskCreateForm({
           'w-full flex items-center gap-2 px-4 py-3',
           'text-neutral-500 hover:text-neutral-700',
           'bg-neutral-50 hover:bg-neutral-100',
-          'rounded-lg border border-dashed border-neutral-200',
+          'rounded-lg border border-dashed border-outline-variant',
           'transition-all duration-200',
           'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
           className
@@ -111,7 +124,7 @@ export function TaskCreateForm({
       onSubmit={handleSubmit}
       onKeyDown={handleKeyDown}
       className={cn(
-        'bg-white rounded-lg border border-neutral-200',
+        'bg-white rounded-lg border border-outline-variant',
         'shadow-elevation-2 animate-scale-in',
         'overflow-hidden',
         className
@@ -131,7 +144,22 @@ export function TaskCreateForm({
         />
 
         {/* Options Row */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
+          {/* Category Selector */}
+          {lists.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-neutral-600">分类:</span>
+              <CategorySelector
+                value={selectedListId}
+                onChange={setSelectedListId}
+                lists={lists}
+                disabled={isLoading}
+                className="w-32"
+              />
+            </div>
+          )}
+          
+          {/* Habit Checkbox */}
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
@@ -139,7 +167,7 @@ export function TaskCreateForm({
               onChange={(e) => setIsHabit(e.target.checked)}
               disabled={isLoading}
               className={cn(
-                'w-4 h-4 rounded border-neutral-300',
+                'w-4 h-4 rounded border-outline-variant',
                 'text-primary-600 focus:ring-primary-500',
                 'transition-colors'
               )}

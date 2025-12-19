@@ -100,10 +100,10 @@ export function LifeEntry({ entry, onUpdate, onDelete, className }: LifeEntryPro
   return (
     <div
       className={cn(
-        'group relative bg-surface-container rounded-xl p-4',
+        'group relative bg-surface-container rounded-2xl p-4',
         'shadow-elevation-1 hover:shadow-elevation-2',
         'transition-shadow duration-200',
-        'border border-neutral-300',
+        'border border-outline-variant',
         className
       )}
     >
@@ -174,7 +174,7 @@ export function LifeEntry({ entry, onUpdate, onDelete, className }: LifeEntryPro
             {onUpdate && (
               <button
                 onClick={handleStartEdit}
-                className="p-1.5 rounded-md text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors"
+                className="p-1.5 rounded-md text-neutral-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
                 title="编辑"
               >
                 <Pencil className="h-4 w-4" />
@@ -183,7 +183,7 @@ export function LifeEntry({ entry, onUpdate, onDelete, className }: LifeEntryPro
             {onDelete && (
               <button
                 onClick={() => onDelete(entry.id)}
-                className="p-1.5 rounded-md text-neutral-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                className="p-1.5 rounded-md text-neutral-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
                 title="删除"
               >
                 <Trash2 className="h-4 w-4" />

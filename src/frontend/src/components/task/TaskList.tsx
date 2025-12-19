@@ -1,7 +1,7 @@
 /**
  * TaskList Component
  * Displays a sortable list of task cards with drag-and-drop functionality
- * Requirements: 4.1, 4.4
+ * Requirements: 4.1, 4.4, 5.1, 5.2, 5.3
  */
 
 import * as React from 'react'
@@ -25,7 +25,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
-import type { Task } from '@/api/types'
+import type { Task, CardList } from '@/api/types'
 import { TaskCard } from './TaskCard'
 
 import type { TaskUpdate } from '@/api/types'
@@ -38,6 +38,8 @@ export interface TaskListProps {
   onDelete?: (task: Task) => void | Promise<void>
   emptyMessage?: string
   className?: string
+  /** Available categories for the category selector in edit mode */
+  lists?: CardList[]
 }
 
 interface SortableTaskItemProps {
@@ -45,9 +47,10 @@ interface SortableTaskItemProps {
   onComplete?: (task: Task) => void
   onSave?: (taskId: string, data: TaskUpdate) => Promise<void>
   onDelete?: (task: Task) => void | Promise<void>
+  lists?: CardList[]
 }
 
-function SortableTaskItem({ task, onComplete, onSave, onDelete }: SortableTaskItemProps) {
+function SortableTaskItem({ task, onComplete, onSave, onDelete, lists }: SortableTaskItemProps) {
   const {
     attributes,
     listeners,
@@ -72,6 +75,7 @@ function SortableTaskItem({ task, onComplete, onSave, onDelete }: SortableTaskIt
         onDelete={onDelete}
         isDragging={isDragging}
         dragHandleProps={listeners}
+        lists={lists}
       />
     </div>
   )
@@ -85,6 +89,7 @@ export function TaskList({
   onDelete,
   emptyMessage = '暂无任务',
   className,
+  lists = [],
 }: TaskListProps) {
   const [activeId, setActiveId] = React.useState<string | null>(null)
   const [localTasks, setLocalTasks] = React.useState(tasks)
@@ -170,6 +175,7 @@ export function TaskList({
               onComplete={onComplete}
               onSave={onSave}
               onDelete={onDelete}
+              lists={lists}
             />
           ))}
         </div>

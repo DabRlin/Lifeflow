@@ -13,9 +13,10 @@ import { LoadingSkeleton, EmptyState } from '@/components/common'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Modal } from '@/components/ui/modal'
 import { aggregateCheckinsByDate } from '@/lib/heatmap'
 import { useUIStore } from '@/stores/ui-store'
-import { Plus, Target, Flame, Calendar, X } from 'lucide-react'
+import { Plus, Target, Flame, Calendar } from 'lucide-react'
 import type { Task, CheckinRecord } from '@/api/types'
 import { tasksApi } from '@/api/tasks'
 import { useQuery } from '@tanstack/react-query'
@@ -201,8 +202,8 @@ export function HabitsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-700">习惯追踪</h1>
-          <p className="text-neutral-600 mt-1">坚持每天的小习惯，成就更好的自己</p>
+          <h1 className="text-headline-md font-semibold text-neutral-700">习惯追踪</h1>
+          <p className="text-body-md text-neutral-600 mt-1">坚持每天的小习惯，成就更好的自己</p>
         </div>
         <Button onClick={() => setShowCreateModal(true)}>
           <Plus className="w-4 h-4 mr-2" />
@@ -227,12 +228,12 @@ export function HabitsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-primary-100 rounded-xl">
+              <div className="p-2.5 bg-primary-100 rounded-lg">
                 <Target className="w-5 h-5 text-primary-600" />
               </div>
               <div>
-                <p className="text-sm text-neutral-600">总习惯数</p>
-                <p className="text-2xl font-bold text-neutral-700">{stats.totalHabits}</p>
+                <p className="text-body-sm text-neutral-600">总习惯数</p>
+                <p className="text-headline-sm font-semibold text-neutral-700">{stats.totalHabits}</p>
               </div>
             </div>
           </CardContent>
@@ -241,12 +242,12 @@ export function HabitsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-tertiary-100 rounded-xl">
-                <Flame className="w-5 h-5 text-tertiary-600" />
+              <div className="p-2.5 bg-primary-100 rounded-lg">
+                <Flame className="w-5 h-5 text-primary-600" />
               </div>
               <div>
-                <p className="text-sm text-neutral-600">最长连胜</p>
-                <p className="text-2xl font-bold text-neutral-700">{stats.longestStreak} 天</p>
+                <p className="text-body-sm text-neutral-600">最长连胜</p>
+                <p className="text-headline-sm font-semibold text-neutral-700">{stats.longestStreak} 天</p>
               </div>
             </div>
           </CardContent>
@@ -255,12 +256,12 @@ export function HabitsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-secondary-100 rounded-xl">
-                <Calendar className="w-5 h-5 text-secondary-600" />
+              <div className="p-2.5 bg-primary-100 rounded-lg">
+                <Calendar className="w-5 h-5 text-primary-600" />
               </div>
               <div>
-                <p className="text-sm text-neutral-600">今日完成</p>
-                <p className="text-2xl font-bold text-neutral-700">
+                <p className="text-body-sm text-neutral-600">今日完成</p>
+                <p className="text-headline-sm font-semibold text-neutral-700">
                   {stats.completedToday}/{stats.totalHabits}
                 </p>
               </div>
@@ -342,205 +343,91 @@ export function HabitsPage() {
       )}
 
       {/* Create Habit Modal */}
-      {showCreateModal && (
-        <div 
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 50,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+      <Modal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        title="新建习惯"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setShowCreateModal(false)}>
+              取消
+            </Button>
+            <Button
+              onClick={handleCreateHabit}
+              disabled={!newHabitTitle.trim() || createTaskMutation.isPending}
+            >
+              {createTaskMutation.isPending ? '创建中...' : '创建'}
+            </Button>
+          </>
+        }
+      >
+        <Input
+          value={newHabitTitle}
+          onChange={(e) => setNewHabitTitle(e.target.value)}
+          placeholder="输入习惯名称..."
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleCreateHabit()
+            }
           }}
-        >
-          <div 
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            }}
-            onClick={() => setShowCreateModal(false)}
-          />
-          <div 
-            style={{
-              position: 'relative',
-              backgroundColor: 'white',
-              borderRadius: '0.75rem',
-              padding: '1.5rem',
-              maxWidth: '24rem',
-              width: '100%',
-              margin: '0 1rem',
-            }}
-            className="shadow-elevation-4"
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#171717' }}>
-                新建习惯
-              </h3>
-              <button
-                onClick={() => setShowCreateModal(false)}
-                style={{ padding: '0.25rem', color: '#737373', background: 'none', border: 'none', cursor: 'pointer' }}
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <Input
-              value={newHabitTitle}
-              onChange={(e) => setNewHabitTitle(e.target.value)}
-              placeholder="输入习惯名称..."
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleCreateHabit()
-                }
-              }}
-              autoFocus
-            />
-            <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-              <Button
-                variant="outline"
-                onClick={() => setShowCreateModal(false)}
-              >
-                取消
-              </Button>
-              <Button
-                onClick={handleCreateHabit}
-                disabled={!newHabitTitle.trim() || createTaskMutation.isPending}
-              >
-                {createTaskMutation.isPending ? '创建中...' : '创建'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+          autoFocus
+        />
+      </Modal>
 
       {/* Edit Habit Modal */}
-      {showEditModal && (
-        <div 
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 50,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+      <Modal
+        isOpen={!!showEditModal}
+        onClose={() => setShowEditModal(null)}
+        title="编辑习惯"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setShowEditModal(null)}>
+              取消
+            </Button>
+            <Button
+              onClick={handleSaveEdit}
+              disabled={!editTitle.trim() || updateTaskMutation.isPending}
+            >
+              {updateTaskMutation.isPending ? '保存中...' : '保存'}
+            </Button>
+          </>
+        }
+      >
+        <Input
+          value={editTitle}
+          onChange={(e) => setEditTitle(e.target.value)}
+          placeholder="输入习惯名称..."
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSaveEdit()
+            }
           }}
-        >
-          <div 
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            }}
-            onClick={() => setShowEditModal(null)}
-          />
-          <div 
-            style={{
-              position: 'relative',
-              backgroundColor: 'white',
-              borderRadius: '0.75rem',
-              padding: '1.5rem',
-              maxWidth: '24rem',
-              width: '100%',
-              margin: '0 1rem',
-            }}
-            className="shadow-elevation-4"
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#171717' }}>
-                编辑习惯
-              </h3>
-              <button
-                onClick={() => setShowEditModal(null)}
-                style={{ padding: '0.25rem', color: '#737373', background: 'none', border: 'none', cursor: 'pointer' }}
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <Input
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              placeholder="输入习惯名称..."
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleSaveEdit()
-                }
-              }}
-              autoFocus
-            />
-            <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-              <Button
-                variant="outline"
-                onClick={() => setShowEditModal(null)}
-              >
-                取消
-              </Button>
-              <Button
-                onClick={handleSaveEdit}
-                disabled={!editTitle.trim() || updateTaskMutation.isPending}
-              >
-                {updateTaskMutation.isPending ? '保存中...' : '保存'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+          autoFocus
+        />
+      </Modal>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div 
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 50,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <div 
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            }}
-            onClick={() => setShowDeleteConfirm(null)}
-          />
-          <div 
-            style={{
-              position: 'relative',
-              backgroundColor: 'white',
-              borderRadius: '0.75rem',
-              padding: '1.5rem',
-              maxWidth: '24rem',
-              width: '100%',
-              margin: '0 1rem',
-            }}
-            className="shadow-elevation-4"
-          >
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#171717' }}>
-              确认删除
-            </h3>
-            <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#525252' }}>
-              确定要删除习惯 "{showDeleteConfirm.title}" 吗？此操作无法撤销。
-            </p>
-            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-              <Button
-                variant="outline"
-                onClick={() => setShowDeleteConfirm(null)}
-              >
-                取消
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleConfirmDelete}
-                disabled={deleteTaskMutation.isPending}
-              >
-                {deleteTaskMutation.isPending ? '删除中...' : '删除'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        isOpen={!!showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(null)}
+        title="确认删除"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(null)}>
+              取消
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={deleteTaskMutation.isPending}
+            >
+              {deleteTaskMutation.isPending ? '删除中...' : '删除'}
+            </Button>
+          </>
+        }
+      >
+        <p>确定要删除习惯 "{showDeleteConfirm?.title}" 吗？此操作无法撤销。</p>
+      </Modal>
     </div>
   )
 }

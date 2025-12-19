@@ -32,7 +32,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 h-screen bg-surface-container border-r border-neutral-300',
+        'fixed left-0 top-0 z-40 h-screen bg-surface-container-low border-r border-outline-variant',
         'transition-all duration-300 ease-in-out',
         'flex flex-col'
       )}
@@ -40,7 +40,7 @@ export function Sidebar() {
     >
       {/* Top section: titlebar drag region + logo, total height matches Header (80px) */}
       <div
-        className="h-20 flex-shrink-0 flex flex-col border-b border-neutral-300"
+        className="h-20 flex-shrink-0 flex flex-col border-b border-outline-variant"
         style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
       >
         {/* Spacer for macOS window controls */}
@@ -92,7 +92,7 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom section */}
-      <div className="border-t border-neutral-300 py-4 px-2">
+      <div className="border-t border-outline-variant py-4 px-2">
         <NavLink
           to="/settings"
           className={({ isActive }) =>

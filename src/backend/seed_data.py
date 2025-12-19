@@ -7,8 +7,37 @@ import uuid
 from datetime import datetime, timedelta
 import random
 
-# Database path
-DB_PATH = "lifeflow.db"
+# Database path - use the same path as the running app
+import os
+import sys
+from pathlib import Path
+
+def get_db_path():
+    """Get database path matching the app's config logic."""
+    # Check for command line argument or environment variable first
+    if len(sys.argv) > 1:
+        return Path(sys.argv[1])
+    
+    if os.environ.get('LIFEFLOW_DATABASE_PATH'):
+        return Path(os.environ['LIFEFLOW_DATABASE_PATH'])
+    
+    # Default to local directory for development
+    local_db = Path(__file__).parent / 'lifeflow.db'
+    if local_db.exists():
+        return local_db
+    
+    # Fall back to user data directory
+    if sys.platform == 'darwin':
+        base = Path.home() / 'Library' / 'Application Support'
+    elif sys.platform == 'win32':
+        base = Path(os.environ.get('APPDATA', Path.home()))
+    else:
+        base = Path(os.environ.get('XDG_DATA_HOME', Path.home() / '.local' / 'share'))
+    
+    return base / 'LifeFlow' / 'lifeflow.db'
+
+DB_PATH = str(get_db_path())
+print(f"📂 使用数据库: {DB_PATH}")
 
 def generate_uuid():
     return str(uuid.uuid4())

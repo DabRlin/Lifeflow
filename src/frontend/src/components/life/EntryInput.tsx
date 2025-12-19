@@ -76,9 +76,9 @@ export function EntryInput({
   return (
     <div
       className={cn(
-        'bg-white rounded-xl p-4',
+        'bg-white rounded-2xl p-4',
         'shadow-elevation-2',
-        'border border-neutral-100',
+        'border border-outline-variant',
         'transition-shadow duration-200',
         'focus-within:shadow-elevation-3',
         className
@@ -94,7 +94,7 @@ export function EntryInput({
         className={cn(
           'w-full resize-none border-0 bg-transparent',
           'text-neutral-900 text-sm leading-relaxed',
-          'placeholder:text-neutral-400',
+          'placeholder:text-neutral-500',
           'focus:outline-none focus:ring-0',
           'min-h-[56px] max-h-[200px]',
           'disabled:opacity-50 disabled:cursor-not-allowed'
@@ -102,8 +102,8 @@ export function EntryInput({
         rows={1}
       />
       
-      <div className="flex items-center justify-between mt-3 pt-3 border-t border-neutral-100">
-        <span className="text-xs text-neutral-400">
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-outline-variant">
+        <span className="text-xs text-neutral-500">
           {content.length > 0 ? `${content.length} 字` : '⌘ + Enter 发送'}
         </span>
         
