@@ -5,6 +5,7 @@
  */
 
 import * as React from 'react'
+import { getLocalDateString } from '@/lib/utils'
 import { useTasks, useCheckinTask, useCreateTask, useDeleteTask, useUpdateTask } from '@/hooks/useTasks'
 import { useDailyRing } from '@/hooks/useStats'
 import { HabitCard, DailyRing, HeatmapCalendar } from '@/components/habit'
@@ -42,8 +43,8 @@ export function HabitsPage() {
     return tasks.filter(task => task.is_habit && !task.is_deleted)
   }, [tasks])
 
-  // Get today's date
-  const today = React.useMemo(() => new Date().toISOString().split('T')[0], [])
+  // Get today's date in local timezone
+  const today = React.useMemo(() => getLocalDateString(), [])
 
   // Separate completed and incomplete habits
   const { completedHabits, incompleteHabits } = React.useMemo(() => {

@@ -6,7 +6,7 @@
 
 import * as React from 'react'
 import { createPortal } from 'react-dom'
-import { cn } from '@/lib/utils'
+import { cn, getLocalDateString } from '@/lib/utils'
 import type { Task, TaskUpdate } from '@/api/types'
 import { Check, GripVertical, Flame, Clock, Edit2, Trash2, X, Save } from 'lucide-react'
 
@@ -44,7 +44,7 @@ export function TaskCard({
   // Check if habit was completed today
   const isCompletedToday = React.useMemo(() => {
     if (!task.is_habit || !task.last_checkin_date) return false
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
     return task.last_checkin_date === today
   }, [task.is_habit, task.last_checkin_date])
 

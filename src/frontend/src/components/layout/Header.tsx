@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useLocation } from 'react-router-dom'
-import { cn } from '@/lib/utils'
+import { cn, getLocalDateString } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui-store'
 import { useUnreadCount, useGenerateReminders, useGenerateAtRiskNotifications } from '@/hooks/useNotifications'
 import { useTasks } from '@/hooks/useTasks'
@@ -32,7 +32,7 @@ export function Header({ className }: HeaderProps) {
   const unreadCount = unreadData?.count || 0
 
   // Calculate context data
-  const today = React.useMemo(() => new Date().toISOString().split('T')[0], [])
+  const today = React.useMemo(() => getLocalDateString(), [])
   
   const contextData = React.useMemo(() => {
     if (!tasks) return null
@@ -130,7 +130,7 @@ export function Header({ className }: HeaderProps) {
   // Generate notifications on first load of the day
   React.useEffect(() => {
     const lastGenDate = localStorage.getItem('lifeflow_last_notification_gen')
-    const todayStr = new Date().toISOString().split('T')[0]
+    const todayStr = getLocalDateString()
     
     if (lastGenDate !== todayStr) {
       generateReminders.mutate()

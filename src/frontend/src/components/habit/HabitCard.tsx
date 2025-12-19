@@ -5,7 +5,7 @@
  */
 
 import * as React from 'react'
-import { cn } from '@/lib/utils'
+import { cn, getLocalDateString } from '@/lib/utils'
 import type { Task } from '@/api/types'
 import { StreakBadge } from './StreakBadge'
 import { CheckinButton } from './CheckinButton'
@@ -34,7 +34,7 @@ export function HabitCard({
   // Check if habit was completed today
   const isCompletedToday = React.useMemo(() => {
     if (!habit.last_checkin_date) return false
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
     return habit.last_checkin_date === today
   }, [habit.last_checkin_date])
 

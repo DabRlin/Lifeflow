@@ -6,6 +6,7 @@
 
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+import { getLocalDateString } from '@/lib/utils'
 import { useTasks, useCheckinTask } from '@/hooks/useTasks'
 import { useDailyRing, useStatsOverview } from '@/hooks/useStats'
 import { useInfiniteLifeEntries } from '@/hooks/useLifeEntries'
@@ -41,8 +42,8 @@ export function HomePage() {
   const { data: lifeEntriesData, isLoading: entriesLoading } = useInfiniteLifeEntries(5)
   const checkinMutation = useCheckinTask()
 
-  // Get today's date
-  const today = React.useMemo(() => new Date().toISOString().split('T')[0], [])
+  // Get today's date in local timezone
+  const today = React.useMemo(() => getLocalDateString(), [])
 
   // Filter habit tasks
   const habits = React.useMemo(() => {

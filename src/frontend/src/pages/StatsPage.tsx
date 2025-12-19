@@ -5,6 +5,7 @@
  */
 
 import * as React from 'react'
+import { getLocalDateString } from '@/lib/utils'
 import { useTasks } from '@/hooks/useTasks'
 import { useDailyRing, useStatsOverview } from '@/hooks/useStats'
 import { DailyRing, HeatmapCalendar } from '@/components/habit'
@@ -38,8 +39,8 @@ export function StatsPage() {
     return tasks.filter((task) => task.is_habit && !task.is_deleted)
   }, [tasks])
 
-  // Get today's date
-  const today = React.useMemo(() => new Date().toISOString().split('T')[0], [])
+  // Get today's date in local timezone
+  const today = React.useMemo(() => getLocalDateString(), [])
 
   // Fetch all check-in records for heatmap and trends
   const { data: allCheckins, isLoading: checkinsLoading } = useQuery({
