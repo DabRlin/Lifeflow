@@ -13,6 +13,7 @@
 | [API 参考](./api-reference.md) | RESTful API 接口文档 |
 | [开发指南](./development.md) | 开发环境搭建、调试、测试 |
 | [部署指南](./deployment.md) | 构建、打包、发布流程 |
+| [代码统计](./code-stats.md) | 项目代码行数统计 |
 | [路线图](./ROADMAP.md) | 开发计划和未来功能 |
 
 ## 🚀 快速开始
