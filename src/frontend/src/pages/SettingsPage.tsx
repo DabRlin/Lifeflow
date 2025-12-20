@@ -30,7 +30,7 @@ import {
 const APP_INFO = {
   name: 'LifeFlow',
   version: '2.0.0',
-  buildDate: '2024-12-18',
+  buildDate: '2025-12-20',
   description: '一款简约高效的个人效率应用',
   github: 'https://github.com/DabRlin/Lifeflow',
 }
