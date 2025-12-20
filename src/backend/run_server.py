@@ -175,25 +175,30 @@ def main():
     if args.reload and is_frozen:
         log("Warning: --reload is not available in packaged mode", "WARN")
     
+    log(f"Starting uvicorn server on {args.host}:{args.port}...")
+    
+    # Create uvicorn config and server for better shutdown control
+    config = uvicorn.Config(
+        "app.main:app",
+        host=args.host,
+        port=args.port,
+        reload=reload_enabled,
+        log_level="info",
+    )
+    server = uvicorn.Server(config)
+    
     # Setup signal handlers for graceful shutdown
     def signal_handler(signum, frame):
-        log("Received shutdown signal, exiting gracefully...")
-        sys.exit(0)
+        log("Received shutdown signal, initiating graceful shutdown...")
+        server.should_exit = True
     
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     
-    log(f"Starting uvicorn server on {args.host}:{args.port}...")
-    
     # Run the server
     try:
-        uvicorn.run(
-            "app.main:app",
-            host=args.host,
-            port=args.port,
-            reload=reload_enabled,
-            log_level="info",
-        )
+        server.run()
+        log("Server shutdown complete")
     except Exception as e:
         log(f"Failed to start server: {e}", "ERROR")
         sys.exit(1)

@@ -247,9 +247,11 @@ app.whenReady().then(initialize);
 
 app.on('window-all-closed', async () => {
   electronLog.info('All windows closed');
-  await cleanupSidecar();
   
+  // On macOS, don't cleanup sidecar here - wait for before-quit
+  // This allows the app to stay in dock and restart properly
   if (process.platform !== 'darwin') {
+    await cleanupSidecar();
     app.quit();
   }
 });

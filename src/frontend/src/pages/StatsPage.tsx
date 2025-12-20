@@ -164,14 +164,14 @@ export function StatsPage() {
                 title="今日打卡"
                 value={statsOverview?.today_checkins ?? localStats?.completedToday ?? 0}
                 icon={<CheckCircle2 className="w-5 h-5" />}
-                colorScheme="success"
+                colorScheme="primary"
               />
               <StatCard
                 title="最长连胜"
                 value={statsOverview?.longest_streak ?? localStats?.longestStreak ?? 0}
                 suffix="天"
                 icon={<Flame className="w-5 h-5" />}
-                colorScheme="warning"
+                colorScheme="primary"
               />
               <StatCard
                 title="完成率"
@@ -232,14 +232,14 @@ export function StatsPage() {
               title="待完成任务"
               value={statsOverview?.pending_tasks ?? (localStats?.totalTasks ?? 0) - (localStats?.completedToday ?? 0)}
               icon={<Clock className="w-5 h-5" />}
-              colorScheme="warning"
+              colorScheme="primary"
             />
             <StatCard
               title="累计连胜天数"
               value={localStats?.totalCurrentStreak ?? 0}
               suffix="天"
               icon={<Flame className="w-5 h-5" />}
-              colorScheme="success"
+              colorScheme="primary"
             />
           </>
         )}
